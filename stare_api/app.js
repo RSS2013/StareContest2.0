@@ -10,7 +10,7 @@ var express     = require('express'),
     moment      = require( 'moment'),
     expressJwt  = require('express-jwt'),
     request     = require('request'),
-    
+    io          = require('socket.io').listen(9001);
 
     app = express();
 
@@ -28,7 +28,7 @@ var allowCrossDomain = function(req, res, next) {
 };
 
 
-app.set('port', 80);
+app.set('port', 9000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -61,6 +61,12 @@ res.send("StareContest2.0!");
 
 });
 
+app.post('/stareContest/museData/player1', function(req,res) {
+
+console.log(req.body);
+
+
+});
 
 
 http.createServer(app).listen(app.get('port'), function(){
