@@ -1,20 +1,18 @@
 window.onload = function() {
     "use strict";
 
-    console.log("YO!");
-
     var timer_done = false;
 
-    var player_2_conc = 0;
+    var player_2_conc   = 0;
     var player_2_mellow = 0;
-    var player_2_atk = false;
+    var player_2_atk    = false;
 
-    var player_1_conc = 0;
+    var player_1_conc   = 0;
     var player_1_mellow = 0;
-    var player_1_atk = false;
+    var player_1_atk    = false;
 
-    var total_player_1_conc = 0;
-    var total_player_2_conc = 0;
+    var total_player_1_conc   = 0;
+    var total_player_2_conc   = 0;
     var total_player_1_mellow = 0;
     var total_player_2_mellow = 0;
 
@@ -48,10 +46,6 @@ window.onload = function() {
         ctxt.fill();
     }
 
-    function currentRadFor (myCirc) {
-        return player_2_conc;
-    };
-
     function displayFinalScores () {
         context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 
@@ -60,26 +54,20 @@ window.onload = function() {
         circPlayer1Mellow.radius = Math.floor(total_player_1_mellow / message_count) + circPlayer1Conc.radius;
         circPlayer2Mellow.radius = Math.floor(total_player_2_mellow / message_count) + circPlayer2Conc.radius;
 
-
         // decide winner
         let player_1_total = circPlayer1Conc.radius + circPlayer1Mellow.radius;
         let player_2_total = circPlayer2Conc.radius + circPlayer2Mellow.radius;
 
-        console.log("p1: ", player_1_total);
-        console.log("p2: ", player_2_total);
-
         if (player_1_total > player_2_total) {
             drawCircle(circPlayer1Mellow, context);
             drawCircle(circPlayer1Conc, context);
-            console.log("Player 1 wins");
             $('h1').text("player 1 wins");
         } else if (player_1_total < player_2_total) {
             drawCircle(circPlayer2Mellow, context);
             drawCircle(circPlayer2Conc, context);
-            console.log("Player 2 wins");
-            $('h1').text("player 1 wins");
+            $('h1').text("player 2 wins");
         } else {
-            console.log("ERROR: NO WINNER");
+            console.log("ERROR: No winner"); // don't trust a tie at this point
         }
 
     };
@@ -87,7 +75,6 @@ window.onload = function() {
     function updateCanvas (canvas, context, startTime) {
 
         $.getJSON('http://starecontest-46160.onmodulus.net/stareContest/game', function (data) {
-            console.log(data);
 
             message_count = message_count + 1;
 
@@ -99,9 +86,6 @@ window.onload = function() {
             player_2_conc   = Math.floor(data['player2']['con']);
             player_2_mellow = Math.floor(data['player2']['mel']);
             player_2_atk    = data['player2']['atk'];
-
-            console.log(player_1_mellow);
-            console.log(player_1_conc);
 
             total_player_1_conc   = total_player_1_conc + player_1_conc;
             total_player_2_conc   = total_player_2_conc + player_2_conc;
@@ -129,24 +113,9 @@ window.onload = function() {
                 }, 300);
             } else {
                 displayFinalScores();
-                console.log(message_count);
-                console.log(total_player_1_conc);
-                console.log("final Score: ", (total_player_1_conc / message_count));
-                console.log("final Score: ", (total_player_2_conc / message_count));
             }
         });
     };
-
-    function updateCircle(myCircle, canvas, context, startTime, newRadius) {
-        myCircle.radius = newRadius;
-        drawCircle(myCircle, context);
-
-        // request new frame
-        requestAnimFrame(function() {
-            updateCircle(myCircle, canvas, context, startTime, currentRadFor(myCircle));
-            // updateCircRadi();
-        });
-    }
 
     function animateTimeBar(sliderRectangle, canvas, context, startTime) {
         // update
@@ -173,13 +142,10 @@ window.onload = function() {
     // find the canvas(s)
     var canvas         = document.getElementById('myCanvas');
     var timelineCanvas = document.getElementById('timelineCanvas');
-    console.log(canvas);
-    console.log(timelineCanvas);
 
     // access the 2d context (think of it as the brush)
-    var context = canvas.getContext('2d');
+    var context         = canvas.getContext('2d');
     var timelineContext = timelineCanvas.getContext('2d');
-
 
     // changing brush color
     context.fillStyle = '#79BD9A';
