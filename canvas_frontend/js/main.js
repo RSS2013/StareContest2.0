@@ -20,54 +20,6 @@ window.onload = function() {
 
     var message_count = 0;
 
-
-    // function WebSocketTest() {
-    //     if ("WebSocket" in window) {
-    //         let ws;
-    //
-    //         console.log("WebSocket is supported by your Browser!");
-    //         // Let us open a web socket
-    //
-    //         ws = new WebSocket("ws://localhost:8080/echo");
-    //         ws.onopen = function() {
-    //             // Web Socket is connected, send data using send()
-    //         };
-    //         ws.onmessage = function(evt) {
-    //             // let received_msg;
-    //             var received_msg = evt.data;
-    //             var obj = JSON.parse(received_msg);
-    //
-    //             message_count = message_count + 1;
-    //
-    //             // reset global (scoff) variables w/ each new message
-    //             player_1_conc   = obj['Player1']['con'];
-    //             player_1_mellow = obj['Player1']['mel'];
-    //             player_1_atk    = obj['Player1']['atk'];
-    //
-    //             player_2_conc   = obj['Player2']['con'];
-    //             player_2_mellow = obj['Player2']['mel'];
-    //             player_2_atk    = obj['Player2']['atk'];
-    //
-    //             total_player_1_conc   = total_player_1_conc + player_1_conc;
-    //             total_player_2_conc   = total_player_2_conc + player_2_conc;
-    //             total_player_1_mellow = total_player_1_mellow + player_1_mellow;
-    //             total_player_2_mellow = total_player_2_mellow + player_2_mellow;
-    //
-    //         };
-    //     } else {
-    //         // The browser doesn't support WebSocket
-    //         console.log("WebSocket NOT supported by your Browser!");
-    //     }
-    // }
-
-    // WebSocketTest();
-
-
-
-
-
-
-
     // ---
 
     window.requestAnimFrame = (function(callback) {
@@ -77,12 +29,12 @@ window.onload = function() {
             };
     })();
 
-    function drawRectangle(myRectangle, context) {
+    function drawRectangle(sliderRectangle, context) {
         context.beginPath();
-        context.rect(myRectangle.x, myRectangle.y, myRectangle.width, myRectangle.height);
+        context.rect(sliderRectangle.x, sliderRectangle.y, sliderRectangle.width, sliderRectangle.height);
         context.fillStyle = '#033649';
         context.fill();
-        context.lineWidth = myRectangle.borderWidth;
+        context.lineWidth = sliderRectangle.borderWidth;
         context.strokeStyle = '#031634';
         context.stroke();
     }
@@ -94,9 +46,6 @@ window.onload = function() {
         ctxt.fillStyle = myCircle.color;
         ctxt.closePath();
         ctxt.fill();
-        // ctxt.lineWidth = myCircle.borderWidth;
-        // ctxt.strokeStyle = 'black';
-        // ctxt.stroke();
     }
 
     function currentRadFor (myCirc) {
@@ -199,7 +148,7 @@ window.onload = function() {
         });
     }
 
-    function animateTimeBar(myRectangle, canvas, context, startTime) {
+    function animateTimeBar(sliderRectangle, canvas, context, startTime) {
         // update
         var time = (new Date()).getTime() - startTime;
 
@@ -207,21 +156,17 @@ window.onload = function() {
         // pixels / second
         var newX = linearSpeed * time / 1000;
 
-        if (newX < canvas.width - myRectangle.width - myRectangle.borderWidth / 2) {
-            myRectangle.x = newX;
+        if (newX < canvas.width - sliderRectangle.width - sliderRectangle.borderWidth / 2) {
+            sliderRectangle.x = newX;
         } else {
             timer_done = true;
         }
 
-        // clear
-        // context.clearRect(0, 0, canvas.width, canvas.height);
-
-        drawRectangle(myRectangle, context);
+        drawRectangle(sliderRectangle, context);
 
         // request new frame
         requestAnimFrame(function() {
-            animateTimeBar(myRectangle, canvas, context, startTime);
-            // updateCircRadi();
+            animateTimeBar(sliderRectangle, canvas, context, startTime);
         });
     }
 
@@ -235,20 +180,11 @@ window.onload = function() {
     var context = canvas.getContext('2d');
     var timelineContext = timelineCanvas.getContext('2d');
 
-    // render graphics (x, y, width, height)
-    // context.fillStyle = 'Green';
-    // context.fillRect(300, 200, 200, 100);
 
     // changing brush color
     context.fillStyle = '#79BD9A';
 
     // (x, y, radius, start ∠, end ∠, antiClockwise)
-
-    // left, big
-    // context.beginPath();
-    // context.arc(200, 200, 100, 0, 2 * Math.PI, false);
-    // context.closePath();
-    // context.fill();
 
     // changing brush color
     context.fillStyle = '#79BD9A';
@@ -262,12 +198,6 @@ window.onload = function() {
         antiClockwise: false,
         color: "#79BD9A"
     };
-
-    // right, big
-    // context.beginPath();
-    // context.arc(600, 200, 150, 0, 2 * Math.PI, false);
-    // context.closePath();
-    // context.fill();
 
     var circPlayer2Mellow = {
         x: 600,
@@ -307,7 +237,7 @@ window.onload = function() {
     drawCircle(circPlayer1Conc, context);
     drawCircle(circPlayer2Conc, context);
 
-    var myRectangle = {
+    var sliderRectangle = {
         x: 0,
         y: 0,
         width: 33,
@@ -315,13 +245,11 @@ window.onload = function() {
         borderWidth: 5
     };
 
-    drawRectangle(myRectangle, timelineContext);
+    drawRectangle(sliderRectangle, timelineContext);
 
-    // wait one second before starting animation
     setTimeout(function() {
         var startTime = (new Date()).getTime();
-        animateTimeBar(myRectangle, timelineCanvas, timelineContext, startTime);
-        // updateCircle(circPlayer2Conc, canvas, context, startTime, circPlayer2Conc.radius);
+        animateTimeBar(sliderRectangle, timelineCanvas, timelineContext, startTime);
         updateCanvas(canvas, context, startTime);
-    }, 500); // 2DO: change to 30000?
+    }, 500); // delay before starting animation
 };
