@@ -95,6 +95,9 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+body {
+  background-color: #E8DDCB;
+}
 
 canvas {
    padding-left: 0;
@@ -107,6 +110,9 @@ canvas {
 
 h1 {
   text-align: center;
+  color: #033649;
+  font-size: 230%;
+  font-family: 'Open Sans', sans-serif;
 }
 
 

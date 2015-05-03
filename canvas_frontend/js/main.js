@@ -13,6 +13,15 @@ window.onload = function() {
     var player_1_mellow = 0;
     var player_1_atk = false;
 
+    var total_player_1_conc = 0;
+    var total_player_2_conc = 0;
+    var total_player_1_mellow = 0;
+    var total_player_2_mellow = 0;
+
+    var message_count = 0;
+
+
+
     function WebSocketTest() {
         if ("WebSocket" in window) {
             let ws;
@@ -28,6 +37,8 @@ window.onload = function() {
                 var received_msg = evt.data;
                 var obj = JSON.parse(received_msg);
 
+                message_count = message_count + 1;
+
                 // reset global (scoff) variables w/ each new message
                 player_1_conc   = obj['Player1']['con'];
                 player_1_mellow = obj['Player1']['mel'];
@@ -36,6 +47,11 @@ window.onload = function() {
                 player_2_conc   = obj['Player2']['con'];
                 player_2_mellow = obj['Player2']['mel'];
                 player_2_atk    = obj['Player2']['atk'];
+
+                total_player_1_conc   = total_player_1_conc + player_1_conc;
+                total_player_2_conc   = total_player_2_conc + player_2_conc;
+                total_player_1_mellow = total_player_1_mellow + player_1_mellow;
+                total_player_2_mellow = total_player_2_mellow + player_2_mellow;
 
             };
         } else {
@@ -64,10 +80,10 @@ window.onload = function() {
     function drawRectangle(myRectangle, context) {
         context.beginPath();
         context.rect(myRectangle.x, myRectangle.y, myRectangle.width, myRectangle.height);
-        context.fillStyle = '#222222';
+        context.fillStyle = '#033649';
         context.fill();
         context.lineWidth = myRectangle.borderWidth;
-        context.strokeStyle = 'black';
+        context.strokeStyle = '#031634';
         context.stroke();
     }
 
@@ -78,13 +94,33 @@ window.onload = function() {
         ctxt.fillStyle = myCircle.color;
         ctxt.closePath();
         ctxt.fill();
-        ctxt.lineWidth = myCircle.borderWidth;
-        ctxt.strokeStyle = 'black';
-        ctxt.stroke();
+        // ctxt.lineWidth = myCircle.borderWidth;
+        // ctxt.strokeStyle = 'black';
+        // ctxt.stroke();
     }
 
     function currentRadFor (myCirc) {
         return player_2_conc;
+    };
+
+    function displayFinalScores () {
+        context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+
+        circPlayer1Conc.radius   = Math.floor(total_player_1_conc / message_count);
+        circPlayer2Conc.radius   = Math.floor(total_player_2_conc / message_count);
+        circPlayer1Mellow.radius = Math.floor(total_player_1_mellow / message_count) + circPlayer1Conc.radius;
+        circPlayer2Mellow.radius = Math.floor(total_player_2_mellow / message_count) + circPlayer2Conc.radius;
+
+        let winner;
+
+        if ((circPlayer1Conc + circPlayer1Mellow) > (circPlayer2Conc + circPlayer2Mellow)) {
+            drawCircle(circPlayer1Mellow, context);
+            drawCircle(circPlayer1Conc, context);
+        } else {
+            drawCircle(circPlayer2Mellow, context);
+            drawCircle(circPlayer2Conc, context);
+        }
+
     };
 
     function updateCanvas (canvas, context, startTime) {
@@ -104,6 +140,11 @@ window.onload = function() {
         requestAnimFrame(function() {
             if (timer_done == false) {
                 updateCanvas(canvas, context, startTime);
+            } else {
+                displayFinalScores();
+                console.log(message_count);
+                console.log(total_player_1_conc);
+                console.log("final Score: ", (total_player_1_conc / message_count));
             }
         });
     };
@@ -157,11 +198,11 @@ window.onload = function() {
     var timelineContext = timelineCanvas.getContext('2d');
 
     // render graphics (x, y, width, height)
-    context.fillStyle = 'Green';
-    context.fillRect(300, 200, 200, 100);
+    // context.fillStyle = 'Green';
+    // context.fillRect(300, 200, 200, 100);
 
     // changing brush color
-    context.fillStyle = 'Navy';
+    context.fillStyle = '#79BD9A';
 
     // (x, y, radius, start ∠, end ∠, antiClockwise)
 
@@ -178,7 +219,7 @@ window.onload = function() {
         startAngle: 0,
         endAngle: 2 * Math.PI,
         antiClockwise: false,
-        color: "Navy"
+        color: "#79BD9A"
     };
 
     // right, big
@@ -194,11 +235,11 @@ window.onload = function() {
         startAngle: 0,
         endAngle: 2 * Math.PI,
         antiClockwise: false,
-        color: "Navy"
+        color: "#79BD9A"
     };
 
     // changing brush color
-    context.fillStyle = 'Red';
+    context.fillStyle = '#0B486B';
 
     var circPlayer1Conc = {
         x: 200,
@@ -207,7 +248,7 @@ window.onload = function() {
         startAngle: 0,
         endAngle: 2 * Math.PI,
         antiClockwise: false,
-        color: "Red"
+        color: "#0B486B"
     };
 
     var circPlayer2Conc = {
@@ -217,7 +258,7 @@ window.onload = function() {
         startAngle: 0,
         endAngle: 2 * Math.PI,
         antiClockwise: false,
-        color: "Red"
+        color: "#0B486B"
     };
 
     drawCircle(circPlayer1Conc, context)
