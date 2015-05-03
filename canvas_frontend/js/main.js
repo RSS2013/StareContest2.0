@@ -21,46 +21,46 @@ window.onload = function() {
     var message_count = 0;
 
 
+    // function WebSocketTest() {
+    //     if ("WebSocket" in window) {
+    //         let ws;
+    //
+    //         console.log("WebSocket is supported by your Browser!");
+    //         // Let us open a web socket
+    //
+    //         ws = new WebSocket("ws://localhost:8080/echo");
+    //         ws.onopen = function() {
+    //             // Web Socket is connected, send data using send()
+    //         };
+    //         ws.onmessage = function(evt) {
+    //             // let received_msg;
+    //             var received_msg = evt.data;
+    //             var obj = JSON.parse(received_msg);
+    //
+    //             message_count = message_count + 1;
+    //
+    //             // reset global (scoff) variables w/ each new message
+    //             player_1_conc   = obj['Player1']['con'];
+    //             player_1_mellow = obj['Player1']['mel'];
+    //             player_1_atk    = obj['Player1']['atk'];
+    //
+    //             player_2_conc   = obj['Player2']['con'];
+    //             player_2_mellow = obj['Player2']['mel'];
+    //             player_2_atk    = obj['Player2']['atk'];
+    //
+    //             total_player_1_conc   = total_player_1_conc + player_1_conc;
+    //             total_player_2_conc   = total_player_2_conc + player_2_conc;
+    //             total_player_1_mellow = total_player_1_mellow + player_1_mellow;
+    //             total_player_2_mellow = total_player_2_mellow + player_2_mellow;
+    //
+    //         };
+    //     } else {
+    //         // The browser doesn't support WebSocket
+    //         console.log("WebSocket NOT supported by your Browser!");
+    //     }
+    // }
 
-    function WebSocketTest() {
-        if ("WebSocket" in window) {
-            let ws;
-
-            console.log("WebSocket is supported by your Browser!");
-            // Let us open a web socket
-            ws = new WebSocket("ws://localhost:8080/echo");
-            ws.onopen = function() {
-                // Web Socket is connected, send data using send()
-            };
-            ws.onmessage = function(evt) {
-                // let received_msg;
-                var received_msg = evt.data;
-                var obj = JSON.parse(received_msg);
-
-                message_count = message_count + 1;
-
-                // reset global (scoff) variables w/ each new message
-                player_1_conc   = obj['Player1']['con'];
-                player_1_mellow = obj['Player1']['mel'];
-                player_1_atk    = obj['Player1']['atk'];
-
-                player_2_conc   = obj['Player2']['con'];
-                player_2_mellow = obj['Player2']['mel'];
-                player_2_atk    = obj['Player2']['atk'];
-
-                total_player_1_conc   = total_player_1_conc + player_1_conc;
-                total_player_2_conc   = total_player_2_conc + player_2_conc;
-                total_player_1_mellow = total_player_1_mellow + player_1_mellow;
-                total_player_2_mellow = total_player_2_mellow + player_2_mellow;
-
-            };
-        } else {
-            // The browser doesn't support WebSocket
-            console.log("WebSocket NOT supported by your Browser!");
-        }
-    }
-
-    WebSocketTest();
+    // WebSocketTest();
 
 
 
@@ -111,19 +111,55 @@ window.onload = function() {
         circPlayer1Mellow.radius = Math.floor(total_player_1_mellow / message_count) + circPlayer1Conc.radius;
         circPlayer2Mellow.radius = Math.floor(total_player_2_mellow / message_count) + circPlayer2Conc.radius;
 
-        let winner;
 
-        if ((circPlayer1Conc + circPlayer1Mellow) > (circPlayer2Conc + circPlayer2Mellow)) {
+        // decide winner
+        let player_1_total = circPlayer1Conc.radius + circPlayer1Mellow.radius;
+        let player_2_total = circPlayer2Conc.radius + circPlayer2Mellow.radius;
+
+        console.log("p1: ", player_1_total);
+        console.log("p2: ", player_2_total);
+
+        if (player_1_total > player_2_total) {
             drawCircle(circPlayer1Mellow, context);
             drawCircle(circPlayer1Conc, context);
-        } else {
+            console.log("Player 1 wins");
+            $('h1').text("player 1 wins");
+        } else if (player_1_total < player_2_total) {
             drawCircle(circPlayer2Mellow, context);
             drawCircle(circPlayer2Conc, context);
+            console.log("Player 2 wins");
+            $('h1').text("player 1 wins");
+        } else {
+            console.log("ERROR: NO WINNER");
         }
 
     };
 
     function updateCanvas (canvas, context, startTime) {
+
+        $.getJSON('http://starecontest-46160.onmodulus.net/stareContest/game', function (data) {
+            console.log(data);
+
+            message_count = message_count + 1;
+
+            // reset global (scoff) variables w/ each new message
+            player_1_conc   = Math.floor(data['player1']['con']);
+            player_1_mellow = Math.floor(data['player1']['mel']);
+            player_1_atk    = data['player1']['atk'];
+
+            player_2_conc   = Math.floor(data['player2']['con']);
+            player_2_mellow = Math.floor(data['player2']['mel']);
+            player_2_atk    = data['player2']['atk'];
+
+            console.log(player_1_mellow);
+            console.log(player_1_conc);
+
+            total_player_1_conc   = total_player_1_conc + player_1_conc;
+            total_player_2_conc   = total_player_2_conc + player_2_conc;
+            total_player_1_mellow = total_player_1_mellow + player_1_mellow;
+            total_player_2_mellow = total_player_2_mellow + player_2_mellow;
+        })
+
         context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 
         circPlayer1Conc.radius = player_1_conc;
@@ -139,16 +175,18 @@ window.onload = function() {
         // request new frame
         requestAnimFrame(function() {
             if (timer_done == false) {
-                updateCanvas(canvas, context, startTime);
+                setTimeout(function () {
+                    updateCanvas(canvas, context, startTime);
+                }, 300);
             } else {
                 displayFinalScores();
                 console.log(message_count);
                 console.log(total_player_1_conc);
                 console.log("final Score: ", (total_player_1_conc / message_count));
+                console.log("final Score: ", (total_player_2_conc / message_count));
             }
         });
     };
-
 
     function updateCircle(myCircle, canvas, context, startTime, newRadius) {
         myCircle.radius = newRadius;
@@ -207,10 +245,13 @@ window.onload = function() {
     // (x, y, radius, start ∠, end ∠, antiClockwise)
 
     // left, big
-    context.beginPath();
-    context.arc(200, 200, 100, 0, 2 * Math.PI, false);
-    context.closePath();
-    context.fill();
+    // context.beginPath();
+    // context.arc(200, 200, 100, 0, 2 * Math.PI, false);
+    // context.closePath();
+    // context.fill();
+
+    // changing brush color
+    context.fillStyle = '#79BD9A';
 
     var circPlayer1Mellow = {
         x: 200,
@@ -223,15 +264,15 @@ window.onload = function() {
     };
 
     // right, big
-    context.beginPath();
-    context.arc(600, 200, 150, 0, 2 * Math.PI, false);
-    context.closePath();
-    context.fill();
+    // context.beginPath();
+    // context.arc(600, 200, 150, 0, 2 * Math.PI, false);
+    // context.closePath();
+    // context.fill();
 
     var circPlayer2Mellow = {
         x: 600,
         y: 200,
-        radius: 150,
+        radius: 100,
         startAngle: 0,
         endAngle: 2 * Math.PI,
         antiClockwise: false,
@@ -261,8 +302,10 @@ window.onload = function() {
         color: "#0B486B"
     };
 
-    drawCircle(circPlayer1Conc, context)
-    drawCircle(circPlayer2Conc, context)
+    drawCircle(circPlayer1Mellow, context);
+    drawCircle(circPlayer2Mellow, context);
+    drawCircle(circPlayer1Conc, context);
+    drawCircle(circPlayer2Conc, context);
 
     var myRectangle = {
         x: 0,
