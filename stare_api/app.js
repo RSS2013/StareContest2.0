@@ -9,9 +9,7 @@ var express     = require('express'),
     _           = require('lodash-node/underscore'),
     moment      = require( 'moment'),
     expressJwt  = require('express-jwt'),
-    secret      = require('./lib/constants').secret,
     request     = require('request'),
-    graph       = require('./routes/graph'),
     
 
     app = express();
@@ -30,7 +28,7 @@ var allowCrossDomain = function(req, res, next) {
 };
 
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', 80);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -55,9 +53,13 @@ process.on('uncaughtException', function (err) {
     console.error(err.stack);
 });
 
-app.post('/api/game', documents.getNews);
-app.get('/api/documents/top20news', documents.getTop20News);
+//app.post('/api/game', documents.getNews);
+//app.get('/api/documents/top20news', documents.getTop20News);
+app.get('/stareContest', function(req,res) {
 
+res.send("StareContest2.0!");
+
+});
 
 
 
