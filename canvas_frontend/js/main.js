@@ -74,7 +74,41 @@ window.onload = function() {
 
     function updateCanvas (canvas, context, startTime) {
 
-        $.getJSON('http://starecontest-46160.onmodulus.net/stareContest/game', function (data) {
+        let debugging = true;
+        if (debugging == false) {
+            $.getJSON('http://starecontest-46160.onmodulus.net/stareContest/game', function (data) {
+
+                message_count = message_count + 1;
+
+                // reset global (scoff) variables w/ each new message
+                player_1_conc   = Math.floor(data['player1']['con']);
+                player_1_mellow = Math.floor(data['player1']['mel']);
+                player_1_atk    = data['player1']['atk'];
+
+                player_2_conc   = Math.floor(data['player2']['con']);
+                player_2_mellow = Math.floor(data['player2']['mel']);
+                player_2_atk    = data['player2']['atk'];
+
+                total_player_1_conc   = total_player_1_conc + player_1_conc;
+                total_player_2_conc   = total_player_2_conc + player_2_conc;
+                total_player_1_mellow = total_player_1_mellow + player_1_mellow;
+                total_player_2_mellow = total_player_2_mellow + player_2_mellow;
+            })
+        } else {
+
+            // create sample data
+            let data = {
+                "player1" : {
+                    "con": Math.floor(Math.random() * 100),
+                    "mel": Math.floor(Math.random() * 100),
+                    "atk": (Math.floor(Math.random() * 6) == 1),
+                },
+                "player2" : {
+                    "con": Math.floor(Math.random() * 100),
+                    "mel": Math.floor(Math.random() * 100),
+                    "atk": (Math.floor(Math.random() * 6) == 1),
+                }
+            };
 
             message_count = message_count + 1;
 
@@ -91,7 +125,8 @@ window.onload = function() {
             total_player_2_conc   = total_player_2_conc + player_2_conc;
             total_player_1_mellow = total_player_1_mellow + player_1_mellow;
             total_player_2_mellow = total_player_2_mellow + player_2_mellow;
-        })
+
+        }
 
         context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
 
